@@ -1,2 +1,5 @@
 allow surfaceflinger self:process execmem;
+<<<<<<< HEAD
 allow surfaceflinger ashmem_device:chr_file execute;
+=======
+>>>>>>> cd0afdc... KitKat AOSP initial commit

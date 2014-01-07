@@ -92,10 +92,18 @@ ifeq ($(FORCE_ARM_DEBUGGING),true)
   $(combo_2nd_arch_prefix)TARGET_thumb_CFLAGS += -marm -fno-omit-frame-pointer
 endif
 
+ifeq ($(TARGET_DISABLE_ARM_PIE),true)
+   PIE_GLOBAL_CFLAGS :=
+   PIE_EXECUTABLE_TRANSFORM :=
+else
+   PIE_GLOBAL_CFLAGS := -fPIE
+   PIE_EXECUTABLE_TRANSFORM := -fPIE -pie
+endif
+
 android_config_h := $(call select-android-config-h,linux-arm)
 
 $(combo_2nd_arch_prefix)TARGET_GLOBAL_CFLAGS += \
-			-msoft-float \
+			-msoft-float -fpic $(PIE_GLOBAL_CFLAGS) \
 			-ffunction-sections \
 			-fdata-sections \
 			-funwind-tables \
@@ -191,5 +199,29 @@ $(combo_2nd_arch_prefix)TARGET_CRTEND_SO_O := $($(combo_2nd_arch_prefix)TARGET_O
 $(combo_2nd_arch_prefix)TARGET_STRIP_MODULE:=true
 
 $(combo_2nd_arch_prefix)TARGET_DEFAULT_SYSTEM_SHARED_LIBRARIES := libc libm
+define transform-o-to-executable-inner
+$(hide) $(PRIVATE_CXX) -nostdlib -Bdynamic $(PIE_EXECUTABLE_TRANSFORM) \
+	-Wl,-dynamic-linker,/system/bin/linker \
+	-Wl,--gc-sections \
+	-Wl,-z,nocopyreloc \
+	$(PRIVATE_TARGET_GLOBAL_LD_DIRS) \
+	-Wl,-rpath-link=$(TARGET_OUT_INTERMEDIATE_LIBRARIES) \
+	$(if $(filter true,$(PRIVATE_NO_CRT)),,$(PRIVATE_TARGET_CRTBEGIN_DYNAMIC_O)) \
+	$(PRIVATE_ALL_OBJECTS) \
+	-Wl,--whole-archive \
+	$(call normalize-target-libraries,$(PRIVATE_ALL_WHOLE_STATIC_LIBRARIES)) \
+	-Wl,--no-whole-archive \
+	$(if $(PRIVATE_GROUP_STATIC_LIBRARIES),-Wl$(comma)--start-group) \
+	$(call normalize-target-libraries,$(PRIVATE_ALL_STATIC_LIBRARIES)) \
+	$(if $(PRIVATE_GROUP_STATIC_LIBRARIES),-Wl$(comma)--end-group) \
+	$(if $(TARGET_BUILD_APPS),$(PRIVATE_TARGET_LIBGCC)) \
+	$(call normalize-target-libraries,$(PRIVATE_ALL_SHARED_LIBRARIES)) \
+	-o $@ \
+	$(PRIVATE_TARGET_GLOBAL_LDFLAGS) \
+	$(PRIVATE_LDFLAGS) \
+	$(PRIVATE_TARGET_FDO_LIB) \
+	$(PRIVATE_TARGET_LIBGCC) \
+	$(if $(filter true,$(PRIVATE_NO_CRT)),,$(PRIVATE_TARGET_CRTEND_O))
+endef
 
 $(combo_2nd_arch_prefix)TARGET_LINKER := /system/bin/linker

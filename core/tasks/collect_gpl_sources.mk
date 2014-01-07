@@ -16,8 +16,13 @@ gpl_source_tgz := $(call intermediates-dir-for,PACKAGING,gpl_source,HOST,COMMON)
 
 # FORCE since we can't know whether any of the sources changed
 $(gpl_source_tgz): PRIVATE_PATHS := $(sort $(patsubst %/, %, $(dir $(ALL_GPL_MODULE_LICENSE_FILES))))
+<<<<<<< HEAD
 $(gpl_source_tgz) : $(ALL_GPL_MODULE_LICENSE_FILES) FORCE
 	@echo Package gpl sources: $@
+=======
+$(gpl_source_tgz) : $(ALL_GPL_MODULE_LICENSE_FILES)
+	@echo -e ${CL_GRN}"Package gpl sources:"${CL_RST}" $@"
+>>>>>>> cd0afdc... KitKat AOSP initial commit
 	@rm -rf $(dir $@) && mkdir -p $(dir $@)
 	$(hide) tar cfz $@ --exclude ".git*" $(PRIVATE_PATHS)
 

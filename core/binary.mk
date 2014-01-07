@@ -839,12 +839,20 @@ endif
 import_includes := $(intermediates)/import_includes
 import_includes_deps := $(strip \
     $(foreach l, $(installed_shared_library_module_names), \
+<<<<<<< HEAD
       $(call intermediates-dir-for,SHARED_LIBRARIES,$(l),$(LOCAL_IS_HOST_MODULE),,$(LOCAL_2ND_ARCH_VAR_PREFIX))/export_includes) \
     $(foreach l, $(my_static_libraries) $(my_whole_static_libraries), \
       $(call intermediates-dir-for,STATIC_LIBRARIES,$(l),$(LOCAL_IS_HOST_MODULE),,$(LOCAL_2ND_ARCH_VAR_PREFIX))/export_includes))
 $(import_includes): PRIVATE_IMPORT_EXPORT_INCLUDES := $(import_includes_deps)
 $(import_includes) : $(LOCAL_MODULE_MAKEFILE) $(import_includes_deps)
 	@echo Import includes file: $@
+=======
+      $(call intermediates-dir-for,SHARED_LIBRARIES,$(l),$(LOCAL_IS_HOST_MODULE))/export_includes) \
+    $(foreach l, $(LOCAL_STATIC_LIBRARIES) $(LOCAL_WHOLE_STATIC_LIBRARIES), \
+      $(call intermediates-dir-for,STATIC_LIBRARIES,$(l),$(LOCAL_IS_HOST_MODULE))/export_includes))
+$(import_includes) : $(import_includes_deps)
+	@echo -e ${CL_CYN}Import includes file:${CL_RST} $@
+>>>>>>> cd0afdc... KitKat AOSP initial commit
 	$(hide) mkdir -p $(dir $@) && rm -f $@
 ifdef import_includes_deps
 	$(hide) for f in $(PRIVATE_IMPORT_EXPORT_INCLUDES); do \
@@ -875,7 +883,16 @@ normal_objects := \
 
 all_objects := $(normal_objects) $(gen_o_objects)
 
+<<<<<<< HEAD
 my_c_includes += $(TOPDIR)$(LOCAL_PATH) $(intermediates) $(generated_sources_dir)
+=======
+## Allow a device's own headers to take precedence over global ones
+ifneq ($(TARGET_SPECIFIC_HEADER_PATH),)
+LOCAL_C_INCLUDES := $(TOPDIR)$(TARGET_SPECIFIC_HEADER_PATH) $(LOCAL_C_INCLUDES)
+endif
+
+LOCAL_C_INCLUDES += $(TOPDIR)$(LOCAL_PATH) $(intermediates)
+>>>>>>> cd0afdc... KitKat AOSP initial commit
 
 ifndef LOCAL_SDK_VERSION
   my_c_includes += $(JNI_H_INCLUDE)
@@ -1031,9 +1048,14 @@ $(LOCAL_INSTALLED_MODULE): | $(installed_static_library_notice_file_targets)
 ###########################################################
 export_includes := $(intermediates)/export_includes
 $(export_includes): PRIVATE_EXPORT_C_INCLUDE_DIRS := $(LOCAL_EXPORT_C_INCLUDE_DIRS)
+<<<<<<< HEAD
 # Make sure .pb.h are already generated before any dependent source files get compiled.
 $(export_includes) : $(LOCAL_MODULE_MAKEFILE) $(proto_generated_headers)
 	@echo Export includes file: $< -- $@
+=======
+$(export_includes) : $(LOCAL_MODULE_MAKEFILE)
+	@echo -e ${CL_CYN}Export includes file:${CL_RST} $< -- $@
+>>>>>>> cd0afdc... KitKat AOSP initial commit
 	$(hide) mkdir -p $(dir $@) && rm -f $@
 ifdef LOCAL_EXPORT_C_INCLUDE_DIRS
 	$(hide) for d in $(PRIVATE_EXPORT_C_INCLUDE_DIRS); do \

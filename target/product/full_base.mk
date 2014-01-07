@@ -21,27 +21,23 @@
 
 PRODUCT_PACKAGES := \
     libfwdlockengine \
+<<<<<<< HEAD
     OpenWnn \
     libWnnEngDic \
     libWnnJpnDic \
     libwnndict \
+=======
+>>>>>>> cd0afdc... KitKat AOSP initial commit
     WAPPushManager
-
-PRODUCT_PACKAGES += \
-    Galaxy4 \
-    HoloSpiralWallpaper \
-    LiveWallpapers \
-    LiveWallpapersPicker \
-    MagicSmokeWallpapers \
-    NoiseField \
-    PhaseBeam \
-    VisualizationWallpapers \
-    PhotoTable
 
 # Additional settings used in all AOSP builds
 PRODUCT_PROPERTY_OVERRIDES := \
+<<<<<<< HEAD
     ro.config.ringtone=Ring_Synth_04.ogg \
     ro.config.notification_sound=pixiedust.ogg
+=======
+    ro.com.android.dateformat=MM-dd-yyyy
+>>>>>>> cd0afdc... KitKat AOSP initial commit
 
 # Put en_US first in the list, so make it default.
 PRODUCT_LOCALES := en_US

@@ -76,15 +76,45 @@ layers_file := $(addprefix $(LOCAL_PATH)/, $(LOCAL_JAVA_LAYERS_FILE))
 $(full_classes_compiled_jar): PRIVATE_JAVA_LAYERS_FILE := $(layers_file)
 $(full_classes_compiled_jar): PRIVATE_JAVACFLAGS := $(LOCAL_JAVACFLAGS)
 $(full_classes_compiled_jar): PRIVATE_JAR_EXCLUDE_FILES :=
-$(full_classes_compiled_jar): PRIVATE_JAR_PACKAGES :=
-$(full_classes_compiled_jar): PRIVATE_JAR_EXCLUDE_PACKAGES :=
-$(full_classes_compiled_jar): PRIVATE_RMTYPEDEFS :=
-$(full_classes_compiled_jar): \
-        $(java_sources) \
-        $(java_resource_sources) \
-        $(full_java_lib_deps) \
-        $(jar_manifest_file) \
-        $(proto_java_sources_file_stamp) \
-        $(LOCAL_MODULE_MAKEFILE) \
-        $(LOCAL_ADDITIONAL_DEPENDENCIES)
+$(full_classes_compiled_jar): $(java_sources) $(java_resource_sources) $(full_java_lib_deps) \
+        $(jar_manifest_file) $(proto_java_sources_file_stamp) $(LOCAL_ADDITIONAL_DEPENDENCIES)
+	$(transform-host-java-to-package)
+
+# Run jarjar if necessary, otherwise just copy the file.
+ifneq ($(strip $(LOCAL_JARJAR_RULES)),)
+$(full_classes_jarjar_jar): PRIVATE_JARJAR_RULES := $(LOCAL_JARJAR_RULES)
+$(full_classes_jarjar_jar): $(full_classes_compiled_jar) $(LOCAL_JARJAR_RULES) | $(JARJAR)
+	@echo -e ${CL_YLW}"JarJar:"${CL_RST}" $@"
+	$(hide) java -jar $(JARJAR) process $(PRIVATE_JARJAR_RULES) $< $@
+else
+$(full_classes_jarjar_jar): $(full_classes_compiled_jar) | $(ACP)
+	@echo -e ${CL_YLW}"Copying:"${CL_RST}" $@"
+	$(hide) $(ACP) -fp $< $@
+endif
+
+$(full_classes_jar): $(full_classes_jarjar_jar) | $(ACP)
+	@echo -e ${CL_YLW}"Copying:"${CL_RST}" $@"
+	$(hide) $(ACP) -fp $< $@
+
+$(built_dex): PRIVATE_INTERMEDIATES_DIR := $(intermediates.COMMON)
+$(built_dex): PRIVATE_DX_FLAGS := $(LOCAL_DX_FLAGS)
+$(built_dex): $(full_classes_jar) $(DX)
+	$(transform-classes.jar-to-dex)
+
+$(LOCAL_BUILT_MODULE): PRIVATE_DEX_FILE := $(built_dex)
+$(LOCAL_BUILT_MODULE): $(built_dex) $(java_resource_sources)
+	@echo -e ${CL_YLW}"Host Jar:"${CL_RST}" $(PRIVATE_MODULE) ($@)"
+	$(create-empty-package)
+	$(add-dex-to-package)
+	$(add-carried-java-resources)
+ifneq ($(extra_jar_args),)
+	$(add-java-resources-to-package)
+endif
+
+else
+$(LOCAL_BUILT_MODULE): PRIVATE_JAVACFLAGS := $(LOCAL_JAVACFLAGS)
+$(LOCAL_BUILT_MODULE): PRIVATE_JAR_EXCLUDE_FILES :=
+$(LOCAL_BUILT_MODULE): PRIVATE_JAVA_LAYERS_FILE := $(layers_file)
+$(LOCAL_BUILT_MODULE): $(java_sources) $(java_resource_sources) $(full_java_lib_deps) \
+		$(jar_manifest_file) $(proto_java_sources_file_stamp) $(LOCAL_ADDITIONAL_DEPENDENCIES)
 	$(transform-host-java-to-package)

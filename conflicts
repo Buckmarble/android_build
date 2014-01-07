@@ -1,0 +1,15 @@
+CONFLICT (content): Merge conflict in tools/releasetools/ota_from_target_files
+CONFLICT (content): Merge conflict in tools/releasetools/edify_generator.py
+CONFLICT (content): Merge conflict in target/board/generic/BoardConfig.mk
+CONFLICT (content): Merge conflict in core/version_defaults.mk
+CONFLICT (content): Merge conflict in core/tasks/product-graph.mk
+CONFLICT (content): Merge conflict in core/java.mk
+CONFLICT (content): Merge conflict in core/host_java_library.mk
+CONFLICT (content): Merge conflict in core/definitions.mk
+CONFLICT (content): Merge conflict in core/combo/arch/arm/armv7-a-neon.mk
+CONFLICT (content): Merge conflict in core/combo/TARGET_linux-arm.mk
+CONFLICT (content): Merge conflict in core/cleanbuild.mk
+CONFLICT (content): Merge conflict in core/build_id.mk
+CONFLICT (content): Merge conflict in core/base_rules.mk
+CONFLICT (content): Merge conflict in core/Makefile
+

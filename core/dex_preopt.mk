@@ -31,9 +31,24 @@ endef
 # Special rules for building stripped boot jars that override java_library.mk rules
 
 # $(1): boot jar module name
+<<<<<<< HEAD
 define _dexpreopt-boot-jar-remove-classes.dex
 _dbj_jar_no_dex := $(DEXPREOPT_BOOT_JAR_DIR_FULL_PATH)/$(1)_nodex.jar
 _dbj_src_jar := $(call intermediates-dir-for,JAVA_LIBRARIES,$(1),,COMMON)/javalib.jar
+=======
+define _dexpreopt-boot-jar
+$(eval _dbj_jar := $(DEXPREOPT_BOOT_JAR_DIR_FULL_PATH)/$(1).jar)
+$(eval _dbj_odex := $(DEXPREOPT_BOOT_JAR_DIR_FULL_PATH)/$(1).odex)
+$(eval _dbj_jar_no_dex := $(DEXPREOPT_BOOT_JAR_DIR_FULL_PATH)/$(1)_nodex.jar)
+$(eval _dbj_src_jar := $(call intermediates-dir-for,JAVA_LIBRARIES,$(1),,COMMON)/javalib.jar)
+$(eval $(_dbj_odex): PRIVATE_DBJ_JAR := $(_dbj_jar))
+$(_dbj_odex) : $(_dbj_src_jar) | $(ACP) $(DEXPREOPT) $(DEXOPT)
+	@echo -e ${CL_GRN}"Dexpreopt Boot Jar:"${CL_RST}" $$@"
+	$(hide) rm -f $$@
+	$(hide) mkdir -p $$(dir $$@)
+	$(hide) $(ACP) -fp $$< $$(PRIVATE_DBJ_JAR)
+	$$(call dexpreopt-one-file,$$(PRIVATE_DBJ_JAR),$$@)
+>>>>>>> cd0afdc... KitKat AOSP initial commit
 
 $$(_dbj_jar_no_dex) : $$(_dbj_src_jar) | $(ACP) $(AAPT)
 	$$(call copy-file-to-target)

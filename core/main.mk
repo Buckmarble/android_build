@@ -40,13 +40,22 @@ endif
 # Check for broken versions of make.
 # (Allow any version under Cygwin since we don't actually build the platform there.)
 ifeq (,$(findstring CYGWIN,$(shell uname -sm)))
+<<<<<<< HEAD
 ifneq (1,$(strip $(shell expr $(MAKE_VERSION) \>= 3.81)))
 $(warning ********************************************************************************)
 $(warning *  You are using version $(MAKE_VERSION) of make.)
 $(warning *  Android can only be built by versions 3.81 and higher.)
+=======
+ifeq (0,$(shell expr $$(echo $(MAKE_VERSION) | sed "s/[^0-9\.].*//") = 3.81))
+ifeq (0,$(shell expr $$(echo $(MAKE_VERSION) | sed "s/[^0-9\.].*//") = 3.82))
+ifeq (0,$(shell expr $$(echo $(MAKE_VERSION) | sed "s/[^0-9\.].*//") = 4.0))
+$(warning ********************************************************************************)
+$(warning *  You are using version $(MAKE_VERSION) of make.)
+$(warning *  Android is tested to build with versions 3.81, 3.82 and 4.0)
+>>>>>>> cd0afdc... KitKat AOSP initial commit
 $(warning *  see https://source.android.com/source/download.html)
 $(warning ********************************************************************************)
-$(error stopping)
+endif
 endif
 endif
 
@@ -163,11 +172,17 @@ $(info Your version is: $(java_version_str).)
 $(info The required version is: $(required_version))
 $(info $(space))
 $(info Please follow the machine setup instructions at)
+<<<<<<< HEAD
 $(info $(space)$(space)$(space)$(space)https://source.android.com/source/initializing.html)
+=======
+$(info $(space)$(space)$(space)$(space)https://source.android.com/source/download.html)
+$(info $(space))
+$(info Continue at your own peril!)
+>>>>>>> cd0afdc... KitKat AOSP initial commit
 $(info ************************************************************)
-$(error stop)
 endif
 
+<<<<<<< HEAD
 # Check for the current JDK.
 #
 # For Java 1.7, we require OpenJDK on linux and Oracle JDK on Mac OS.
@@ -192,23 +207,49 @@ else # if requires_openjdk
 ifneq ($(shell echo '$(java_version_str)' | grep -i openjdk),)
 $(info ************************************************************)
 $(info You are attempting to build with an unsupported JDK.)
+=======
+# Check for the correct version of java
+java_version := $(shell java -version 2>&1 | head -n 1 | grep '^java .*[ "]1\.[67][\. "$$]')
+ifneq ($(shell java -version 2>&1 | grep -i openjdk),)
+java_version :=
+endif
+ifeq ($(strip $(java_version)),)
+$(info ************************************************************)
+$(info You are attempting to build with an unsupported version)
+$(info of java.)
+$(info $(space))
+$(info Your version is: $(shell java -version 2>&1 | head -n 1).)
+$(info The correct version is: Java SE 1.6 or 1.7.)
+>>>>>>> cd0afdc... KitKat AOSP initial commit
 $(info $(space))
 $(info You use OpenJDK but only Sun/Oracle JDK is supported.)
 $(info Please follow the machine setup instructions at)
 $(info $(space)$(space)$(space)$(space)https://source.android.com/source/download.html)
 $(info ************************************************************)
+<<<<<<< HEAD
 $(error stop)
 endif # java version is not Sun Oracle JDK
 endif # if requires_openjdk
 
 # Check for the correct version of javac
+=======
+endif
+
+# Check for the correct version of javac
+javac_version := $(shell javac -version 2>&1 | head -n 1 | grep '[ "]1\.[67][\. "$$]')
+>>>>>>> cd0afdc... KitKat AOSP initial commit
 ifeq ($(strip $(javac_version)),)
 $(info ************************************************************)
 $(info You are attempting to build with the incorrect version)
 $(info of javac.)
 $(info $(space))
+<<<<<<< HEAD
 $(info Your version is: $(javac_version_str).)
 $(info The required version is: $(required_javac_version))
+=======
+$(info Your version is: $(shell javac -version 2>&1 | head -n 1).)
+$(info The correct version is: 1.6 or 1.7.)
+>>>>>>> cd0afdc... KitKat AOSP initial commit
 $(info $(space))
 $(info Please follow the machine setup instructions at)
 $(info $(space)$(space)$(space)$(space)https://source.android.com/source/download.html)
@@ -256,6 +297,9 @@ endif
 
 # Bring in standard build system definitions.
 include $(BUILD_SYSTEM)/definitions.mk
+
+# Bring in Qualcomm helper macros
+include $(BUILD_SYSTEM)/qcom_utils.mk
 
 # Bring in dex_preopt.mk
 include $(BUILD_SYSTEM)/dex_preopt.mk
@@ -511,7 +555,7 @@ ifneq ($(dont_bother),true)
 subdir_makefiles := \
 	$(shell build/tools/findleaves.py --prune=$(OUT_DIR) --prune=.repo --prune=.git $(subdirs) Android.mk)
 
-$(foreach mk, $(subdir_makefiles), $(info including $(mk) ...)$(eval include $(mk)))
+$(foreach mk, $(subdir_makefiles), $(eval include $(mk)))
 
 endif # dont_bother
 
@@ -1020,7 +1064,7 @@ $(foreach module,$(sample_MODULES),$(eval $(call \
 sample_ADDITIONAL_INSTALLED := \
         $(filter-out $(modules_to_install) $(modules_to_check) $(ALL_PREBUILT),$(sample_MODULES))
 samplecode: $(sample_APKS_COLLECTION)
-	@echo "Collect sample code apks: $^"
+	@echo -e ${CL_GRN}"Collect sample code apks:"${CL_RST}" $^"
 	# remove apks that are not intended to be installed.
 	rm -f $(sample_ADDITIONAL_INSTALLED)
 endif  # samplecode in $(MAKECMDGOALS)
@@ -1031,7 +1075,11 @@ findbugs: $(INTERNAL_FINDBUGS_HTML_TARGET) $(INTERNAL_FINDBUGS_XML_TARGET)
 .PHONY: clean
 clean:
 	@rm -rf $(OUT_DIR)/*
+<<<<<<< HEAD
 	@echo "Entire build directory removed."
+=======
+	@echo -e ${CL_GRN}"Entire build directory removed."${CL_RST}
+>>>>>>> cd0afdc... KitKat AOSP initial commit
 
 .PHONY: clobber
 clobber: clean
@@ -1041,7 +1089,7 @@ clobber: clean
 #xxx scrape this from ALL_MODULE_NAME_TAGS
 .PHONY: modules
 modules:
-	@echo "Available sub-modules:"
+	@echo -e ${CL_GRN}"Available sub-modules:"${CL_RST}
 	@echo "$(call module-names-for-tag-list,$(ALL_MODULE_TAGS))" | \
 	      tr -s ' ' '\n' | sort -u | $(COLUMN)
 
