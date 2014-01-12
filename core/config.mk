@@ -679,10 +679,10 @@ RSCOMPAT_NO_USAGEIO_API_LEVELS := 8 9 10 11 12 13
 # Rules for QCOM targets
 include $(BUILD_SYSTEM)/qcom_target.mk
 
-ifneq ($(CM_BUILD),)
+ifneq ($(DS_BUILD),)
 ## We need to be sure the global selinux policies are included
 ## last, to avoid accidental resetting by device configs
-$(eval include vendor/cm/sepolicy/sepolicy.mk)
+$(eval include vendor/common/sepolicy/sepolicy.mk)
 endif
 >>>>>>> cd0afdc... KitKat AOSP initial commit
 
