@@ -675,7 +675,7 @@ function eat()
 {
     if [ "$OUT" ] ; then
         MODVERSION=$(get_build_var DS_VERSION)
-        ZIPFILE=cm-$MODVERSION.zip
+        ZIPFILE=ds-$MODVERSION.zip
         ZIPPATH=$OUT/$ZIPFILE
         if [ ! -f $ZIPPATH ] ; then
             echo "Nothing to eat"
