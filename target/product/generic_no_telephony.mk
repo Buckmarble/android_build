@@ -24,6 +24,7 @@ PRODUCT_PACKAGES := \
     Music \
     OneTimeInitializer \
     Provision \
+    Settings \
     SystemUI \
     WallpaperCropper
 
